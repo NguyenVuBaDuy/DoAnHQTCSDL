@@ -39,16 +39,18 @@ COMMENT ON COLUMN "NHOM"."TENNHOM" IS 'Admin | QuanLyCuaHang | NhanVienBan | Kho
 
 -- =========================
 -- 2. TAIKHOAN
+-- Đăng nhập bằng MANV / PASSWORD
 -- =========================
 CREATE TABLE "TAIKHOAN" (
   "MATK"       NUMBER         GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   "MANHOM"     NUMBER,
-  "USERNAME"   VARCHAR2(50)   NOT NULL,
+  "MANV"       VARCHAR2(20)   NOT NULL,
   "PASSWORD"   VARCHAR2(255)  NOT NULL,
   "TRANGTHAI"  VARCHAR2(20),
-  CONSTRAINT "UQ_TAIKHOAN_USERNAME" UNIQUE ("USERNAME")
+  CONSTRAINT "UQ_TAIKHOAN_MANV" UNIQUE ("MANV")
 );
 
+COMMENT ON COLUMN "TAIKHOAN"."MANV"      IS 'Mã nhân viên dùng để đăng nhập';
 COMMENT ON COLUMN "TAIKHOAN"."TRANGTHAI" IS 'HoatDong | KhoaCung | KhoaTam';
 
 -- =========================
@@ -83,7 +85,6 @@ CREATE SEQUENCE "SEQ_NV_SO"
 
 CREATE TABLE "NHANVIEN" (
   "MANV"      VARCHAR2(20)   PRIMARY KEY,   -- vd: 20250001, 20250002
-  "MATK"      NUMBER,
   "MACH"      NUMBER,
   "CCCD"      VARCHAR2(20),
   "HOTEN"     VARCHAR2(100)  NOT NULL,

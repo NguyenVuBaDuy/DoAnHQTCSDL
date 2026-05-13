@@ -2,13 +2,14 @@
 -- FILE: 06_data_sample.sql
 -- DESC: Dữ liệu mẫu cho hệ thống quản lý chuỗi cửa hàng
 -- NOTE: Chạy SAU 00 → 05
---       NHOM, TAIKHOAN, NHANVIEN được seed qua Java (DataSeeder)
---       để mã hóa password đúng cách bằng BCrypt.
 --
 -- Quy ước PK:
 --   GENERATED ALWAYS AS IDENTITY → KHÔNG truyền cột PK
 --   MANV (VARCHAR2)              → để NULL, trigger tự sinh YYYYxxxx
 --   MAVOUCHER (VARCHAR2)         → nhập tay
+--
+-- Đăng nhập: dùng MANV / PASSWORD
+--   VD: 20250001 / Admin@123
 -- ============================================================
 
 -- =========================
@@ -18,35 +19,6 @@ INSERT INTO "NHOM" ("TENNHOM") VALUES ('Admin');               -- MANHOM = 1
 INSERT INTO "NHOM" ("TENNHOM") VALUES ('QuanLyCuaHang');       -- MANHOM = 2
 INSERT INTO "NHOM" ("TENNHOM") VALUES ('NhanVienBan');         -- MANHOM = 3
 INSERT INTO "NHOM" ("TENNHOM") VALUES ('Kho');                 -- MANHOM = 4
-COMMIT;
-
--- =========================
--- TAIKHOAN
--- Password gốc:
---   admin        → Admin@123
---   quanly.q1   → Manager@123
---   nhanvien.q1 → Staff@123
---   kho.q1      → Warehouse@123
--- =========================
-INSERT INTO "TAIKHOAN" ("MANHOM","USERNAME","PASSWORD","TRANGTHAI")
-VALUES (1, 'admin',
-        '$2b$10$sHYzPQ6.aoXNNt3aJUyAy.rJ74VE3rkl9Xt04hFf0EKvR.XYMYzRa',
-        'HoatDong');  -- MATK = 1
-
-INSERT INTO "TAIKHOAN" ("MANHOM","USERNAME","PASSWORD","TRANGTHAI")
-VALUES (2, 'quanly.q1',
-        '$2b$10$D1yx4P6XwGSKMZ0.CUkexuhQpO4KYWYH6HqPtq8UWoh8dQB8n/hsa',
-        'HoatDong');  -- MATK = 2
-
-INSERT INTO "TAIKHOAN" ("MANHOM","USERNAME","PASSWORD","TRANGTHAI")
-VALUES (3, 'nhanvien.q1',
-        '$2b$10$3HGY7dWyUZ6I3Rrm5hxfx.Xj3azwxKcX7ZO1LPZfWcy3pC4p22rUa',
-        'HoatDong');  -- MATK = 3
-
-INSERT INTO "TAIKHOAN" ("MANHOM","USERNAME","PASSWORD","TRANGTHAI")
-VALUES (4, 'kho.q1',
-        '$2b$10$fjOPN8CheIp9S2YVys8Q6.1qGj8QEiYyNc4DDiKOG0nwSPuYw8jqa',
-        'HoatDong');  -- MATK = 4
 COMMIT;
 
 -- =========================
@@ -67,27 +39,58 @@ COMMIT;
 -- =========================
 -- NHANVIEN
 -- MANV tự sinh qua trigger TRG_NHANVIEN_MANV
--- Kết quả: 20250001, 20250002, 20250003, 20250004
+-- Kết quả: YYYYxxxx (vd: 20250001, 20250002, 20250003, 20250004)
+-- Phải INSERT trước TAIKHOAN vì TAIKHOAN.MANV tham chiếu NHANVIEN.MANV
 -- =========================
-INSERT INTO "NHANVIEN" ("MATK","MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
-VALUES (1, 1, '001087001234', 'Nguyễn Văn An',
+INSERT INTO "NHANVIEN" ("MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
+VALUES (1, '001087001234', 'Nguyễn Văn An',
         TO_DATE('1990-05-10','YYYY-MM-DD'), 'Nam',
         '0901111111', '10 Nguyễn Huệ, Q.1, TP.HCM', 'Admin');          -- MANV = 20250001
 
-INSERT INTO "NHANVIEN" ("MATK","MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
-VALUES (2, 1, '001087002345', 'Trần Thị Bình',
+INSERT INTO "NHANVIEN" ("MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
+VALUES (1, '001087002345', 'Trần Thị Bình',
         TO_DATE('1993-08-25','YYYY-MM-DD'), 'Nu',
         '0902222222', '20 Lê Lợi, Q.1, TP.HCM', 'QuanLyCuaHang');     -- MANV = 20250002
 
-INSERT INTO "NHANVIEN" ("MATK","MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
-VALUES (3, 1, '001087003456', 'Lê Minh Châu',
+INSERT INTO "NHANVIEN" ("MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
+VALUES (1, '001087003456', 'Lê Minh Châu',
         TO_DATE('2000-12-15','YYYY-MM-DD'), 'Nu',
         '0903333333', '30 Phạm Ngũ Lão, Q.1, TP.HCM', 'NhanVienBan'); -- MANV = 20250003
 
-INSERT INTO "NHANVIEN" ("MATK","MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
-VALUES (4, 1, '001087004567', 'Phạm Thị Dung',
+INSERT INTO "NHANVIEN" ("MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
+VALUES (1, '001087004567', 'Phạm Thị Dung',
         TO_DATE('1997-03-30','YYYY-MM-DD'), 'Nu',
         '0904444444', '40 Bùi Viện, Q.1, TP.HCM', 'NhanVienKho');     -- MANV = 20250004
+COMMIT;
+
+-- =========================
+-- TAIKHOAN
+-- Đăng nhập bằng MANV / PASSWORD
+-- Password gốc (trước khi hash BCrypt):
+--   MANV của Nguyễn Văn An   → Admin@123
+--   MANV của Trần Thị Bình   → Manager@123
+--   MANV của Lê Minh Châu    → Staff@123
+--   MANV của Phạm Thị Dung   → Warehouse@123
+-- =========================
+INSERT INTO "TAIKHOAN" ("MANHOM","MANV","PASSWORD","TRANGTHAI")
+VALUES (1, (SELECT "MANV" FROM "NHANVIEN" WHERE "HOTEN" = 'Nguyễn Văn An'),
+        '$2b$10$sHYzPQ6.aoXNNt3aJUyAy.rJ74VE3rkl9Xt04hFf0EKvR.XYMYzRa',
+        'HoatDong');  -- MATK = 1
+
+INSERT INTO "TAIKHOAN" ("MANHOM","MANV","PASSWORD","TRANGTHAI")
+VALUES (2, (SELECT "MANV" FROM "NHANVIEN" WHERE "HOTEN" = 'Trần Thị Bình'),
+        '$2b$10$D1yx4P6XwGSKMZ0.CUkexuhQpO4KYWYH6HqPtq8UWoh8dQB8n/hsa',
+        'HoatDong');  -- MATK = 2
+
+INSERT INTO "TAIKHOAN" ("MANHOM","MANV","PASSWORD","TRANGTHAI")
+VALUES (3, (SELECT "MANV" FROM "NHANVIEN" WHERE "HOTEN" = 'Lê Minh Châu'),
+        '$2b$10$3HGY7dWyUZ6I3Rrm5hxfx.Xj3azwxKcX7ZO1LPZfWcy3pC4p22rUa',
+        'HoatDong');  -- MATK = 3
+
+INSERT INTO "TAIKHOAN" ("MANHOM","MANV","PASSWORD","TRANGTHAI")
+VALUES (4, (SELECT "MANV" FROM "NHANVIEN" WHERE "HOTEN" = 'Phạm Thị Dung'),
+        '$2b$10$fjOPN8CheIp9S2YVys8Q6.1qGj8QEiYyNc4DDiKOG0nwSPuYw8jqa',
+        'HoatDong');  -- MATK = 4
 COMMIT;
 
 -- =========================

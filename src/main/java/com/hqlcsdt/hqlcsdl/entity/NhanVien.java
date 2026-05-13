@@ -20,10 +20,6 @@ public class NhanVien {
     private String maNv;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MATK", foreignKey = @ForeignKey(name = "FK_NV_TK"))
-    private TaiKhoan taiKhoan;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MACH", foreignKey = @ForeignKey(name = "FK_NV_CH"))
     private CuaHang cuaHang;
 

@@ -5,7 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(name = "TAIKHOAN", uniqueConstraints = {
-    @UniqueConstraint(name = "UQ_TAIKHOAN_USERNAME", columnNames = "USERNAME")
+    @UniqueConstraint(name = "UQ_TAIKHOAN_MANV", columnNames = "MANV")
 })
 @Getter @Setter
 @NoArgsConstructor
@@ -21,8 +21,11 @@ public class TaiKhoan {
     @JoinColumn(name = "MANHOM", foreignKey = @ForeignKey(name = "FK_TK_NHOM"))
     private Nhom nhom;
 
-    @Column(name = "USERNAME", nullable = false, length = 50, unique = true)
-    private String username;
+    /** Mã nhân viên dùng để đăng nhập */
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MANV", nullable = false, unique = true,
+                foreignKey = @ForeignKey(name = "FK_TK_NV"))
+    private NhanVien nhanVien;
 
     @Column(name = "PASSWORD", nullable = false, length = 255)
     private String password;
