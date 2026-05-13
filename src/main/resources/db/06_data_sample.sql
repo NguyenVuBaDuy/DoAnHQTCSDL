@@ -12,6 +12,44 @@
 -- ============================================================
 
 -- =========================
+-- NHOM
+-- =========================
+INSERT INTO "NHOM" ("TENNHOM") VALUES ('Admin');               -- MANHOM = 1
+INSERT INTO "NHOM" ("TENNHOM") VALUES ('QuanLyCuaHang');       -- MANHOM = 2
+INSERT INTO "NHOM" ("TENNHOM") VALUES ('NhanVienBan');         -- MANHOM = 3
+INSERT INTO "NHOM" ("TENNHOM") VALUES ('Kho');                 -- MANHOM = 4
+COMMIT;
+
+-- =========================
+-- TAIKHOAN
+-- Password gốc:
+--   admin        → Admin@123
+--   quanly.q1   → Manager@123
+--   nhanvien.q1 → Staff@123
+--   kho.q1      → Warehouse@123
+-- =========================
+INSERT INTO "TAIKHOAN" ("MANHOM","USERNAME","PASSWORD","TRANGTHAI")
+VALUES (1, 'admin',
+        '$2b$10$sHYzPQ6.aoXNNt3aJUyAy.rJ74VE3rkl9Xt04hFf0EKvR.XYMYzRa',
+        'HoatDong');  -- MATK = 1
+
+INSERT INTO "TAIKHOAN" ("MANHOM","USERNAME","PASSWORD","TRANGTHAI")
+VALUES (2, 'quanly.q1',
+        '$2b$10$D1yx4P6XwGSKMZ0.CUkexuhQpO4KYWYH6HqPtq8UWoh8dQB8n/hsa',
+        'HoatDong');  -- MATK = 2
+
+INSERT INTO "TAIKHOAN" ("MANHOM","USERNAME","PASSWORD","TRANGTHAI")
+VALUES (3, 'nhanvien.q1',
+        '$2b$10$3HGY7dWyUZ6I3Rrm5hxfx.Xj3azwxKcX7ZO1LPZfWcy3pC4p22rUa',
+        'HoatDong');  -- MATK = 3
+
+INSERT INTO "TAIKHOAN" ("MANHOM","USERNAME","PASSWORD","TRANGTHAI")
+VALUES (4, 'kho.q1',
+        '$2b$10$fjOPN8CheIp9S2YVys8Q6.1qGj8QEiYyNc4DDiKOG0nwSPuYw8jqa',
+        'HoatDong');  -- MATK = 4
+COMMIT;
+
+-- =========================
 -- 1. CỬA HÀNG
 -- PK: MACH — auto identity (1, 2, ...)
 -- =========================
@@ -24,6 +62,32 @@ VALUES ('TechStore Quận 7', '456 Nguyễn Thị Thập, Phường Tân Phong, 
 INSERT INTO "CUAHANG" ("TENCH", "DIACHI", "SDT", "EMAIL", "NGAYKHAITRUONG", "TRANGTHAI")
 VALUES ('TechStore Thủ Đức', '789 Võ Văn Ngân, P.Linh Chiểu, TP.Thủ Đức, TP.HCM', '0281112233', 'thuduc@techstore.vn', TO_DATE('2024-03-10','YYYY-MM-DD'), 'HoatDong');
 
+COMMIT;
+
+-- =========================
+-- NHANVIEN
+-- MANV tự sinh qua trigger TRG_NHANVIEN_MANV
+-- Kết quả: 20250001, 20250002, 20250003, 20250004
+-- =========================
+INSERT INTO "NHANVIEN" ("MATK","MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
+VALUES (1, 1, '001087001234', 'Nguyễn Văn An',
+        TO_DATE('1990-05-10','YYYY-MM-DD'), 'Nam',
+        '0901111111', '10 Nguyễn Huệ, Q.1, TP.HCM', 'Admin');          -- MANV = 20250001
+
+INSERT INTO "NHANVIEN" ("MATK","MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
+VALUES (2, 1, '001087002345', 'Trần Thị Bình',
+        TO_DATE('1993-08-25','YYYY-MM-DD'), 'Nu',
+        '0902222222', '20 Lê Lợi, Q.1, TP.HCM', 'QuanLyCuaHang');     -- MANV = 20250002
+
+INSERT INTO "NHANVIEN" ("MATK","MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
+VALUES (3, 1, '001087003456', 'Lê Minh Châu',
+        TO_DATE('2000-12-15','YYYY-MM-DD'), 'Nu',
+        '0903333333', '30 Phạm Ngũ Lão, Q.1, TP.HCM', 'NhanVienBan'); -- MANV = 20250003
+
+INSERT INTO "NHANVIEN" ("MATK","MACH","CCCD","HOTEN","NGAYSINH","GIOITINH","SDT","DIACHI","CHUCVU")
+VALUES (4, 1, '001087004567', 'Phạm Thị Dung',
+        TO_DATE('1997-03-30','YYYY-MM-DD'), 'Nu',
+        '0904444444', '40 Bùi Viện, Q.1, TP.HCM', 'NhanVienKho');     -- MANV = 20250004
 COMMIT;
 
 -- =========================

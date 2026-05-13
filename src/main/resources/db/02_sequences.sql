@@ -1,33 +1,14 @@
 -- ============================================================
 -- FILE: 02_sequences.sql
--- DESC: Tạo Oracle Sequences cho việc sinh mã tự động
--- NOTE: Thay thế AUTO_INCREMENT trong MySQL/PostgreSQL
---       Sử dụng: SEQ_TABLENAME.NEXTVAL
+-- DESC: Tạo Oracle Sequences bổ sung (ngoài identity columns)
+-- NOTE: Hầu hết bảng đã dùng GENERATED ALWAYS AS IDENTITY,
+--       file này chỉ tạo sequence cho các trường hợp đặc biệt.
+--       SEQ_NV_SO: dùng cho trigger TRG_NHANVIEN_MANV
+--                  (đã tạo trong 00_create_tables.sql, chỉ tạo lại nếu chưa có)
 -- ============================================================
 
--- Xóa sequences cũ nếu tồn tại
-BEGIN
-  FOR s IN (SELECT sequence_name FROM user_sequences WHERE sequence_name LIKE 'SEQ_%') LOOP
-    EXECUTE IMMEDIATE 'DROP SEQUENCE "' || s.sequence_name || '"';
-  END LOOP;
-END;
-/
+-- Tạo SEQ_NV_SO nếu chưa tồn tại (đã được tạo trong 00_create_tables.sql)
+-- Không cần tạo lại vì 00_create_tables.sql đã tạo rồi.
+-- File này giữ lại để mở rộng thêm sequences khác trong tương lai.
 
-CREATE SEQUENCE SEQ_NHOM             START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_TAIKHOAN         START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_CUAHANG          START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_NHANVIEN         START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_DANHMUCSANPHAM   START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_SANPHAM          START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_BIENTHE          START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_SERIALNUMBER     START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_NHACUNGCAP       START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_PHIEUNHAP        START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_PHIEUCHUYENKHO   START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_KHACHHANG        START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_DIACHIGIAOHANG   START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_VOUCHER          START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_HOADON           START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-CREATE SEQUENCE SEQ_VANCHUYEN        START WITH 1 INCREMENT BY 1 NOCACHE NOCYCLE;
-
-PROMPT === 02_sequences.sql: Tao sequences hoan tat ===
+PROMPT === 02_sequences.sql: Sequences hoan tat ===

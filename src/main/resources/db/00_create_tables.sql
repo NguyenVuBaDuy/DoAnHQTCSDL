@@ -19,9 +19,9 @@ BEGIN
 END;
 /
 
--- Xóa sequence nếu đã tồn tại
+-- Xóa sequence do user tạo (SEQ_*), KHÔNG xóa identity sequences (ISEQ$$_*)
 BEGIN
-  FOR s IN (SELECT sequence_name FROM user_sequences) LOOP
+  FOR s IN (SELECT sequence_name FROM user_sequences WHERE sequence_name LIKE 'SEQ_%') LOOP
     EXECUTE IMMEDIATE 'DROP SEQUENCE "' || s.sequence_name || '"';
   END LOOP;
 END;
@@ -94,17 +94,6 @@ CREATE TABLE "NHANVIEN" (
   "CHUCVU"    VARCHAR2(50),
   CONSTRAINT "UQ_NHANVIEN_CCCD" UNIQUE ("CCCD")
 );
-
--- Trigger tự sinh MANV = YYYY + số thứ tự 4 chữ số
--- Chỉ sinh khi INSERT mà không truyền MANV
-CREATE OR REPLACE TRIGGER "TRG_NHANVIEN_MANV"
-  BEFORE INSERT ON "NHANVIEN"
-  FOR EACH ROW
-  WHEN (NEW."MANV" IS NULL)
-BEGIN
-  :NEW."MANV" := TO_CHAR(SYSDATE, 'YYYY') || LPAD("SEQ_NV_SO".NEXTVAL, 4, '0');
-END;
-/
 
 -- =========================
 -- 5. DANHMUCSANPHAM
