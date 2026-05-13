@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/cuahang")
 @RequiredArgsConstructor
+@Tag(name = "Cửa hàng", description = "Các API quản lý thông tin cửa hàng")
 public class CuaHangController {
 
     private final CuaHangService cuaHangService;
@@ -23,6 +25,7 @@ public class CuaHangController {
     /**
      * GET /cuahang — Lấy danh sách tất cả cửa hàng
      */
+    @Operation(summary = "Lấy tất cả cửa hàng", description = "Lấy danh sách tất cả các cửa hàng")
     @GetMapping
     public ResponseEntity<ApiResponse<List<CuaHang>>> getAllCuaHang() {
         return ResponseEntity.ok(ApiResponse.success(cuaHangService.getAllCuaHang()));
@@ -31,6 +34,7 @@ public class CuaHangController {
     /**
      * GET /cuahang/{id} — Lấy thông tin cửa hàng theo mã
      */
+    @Operation(summary = "Lấy chi tiết cửa hàng", description = "Lấy thông tin chi tiết cửa hàng theo ID")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CuaHang>> getCuaHangById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(cuaHangService.getCuaHangById(id)));
@@ -39,6 +43,7 @@ public class CuaHangController {
     /**
      * POST /cuahang — Thêm cửa hàng mới
      */
+    @Operation(summary = "Thêm cửa hàng", description = "Thêm một cửa hàng mới vào hệ thống")
     @PostMapping
     public ResponseEntity<ApiResponse<MessageResponse>> createCuaHang(@Valid @RequestBody CuaHangRequest request) {
         cuaHangService.createCuaHang(request);
@@ -48,6 +53,7 @@ public class CuaHangController {
     /**
      * PUT /cuahang/{id} — Cập nhật thông tin cửa hàng
      */
+    @Operation(summary = "Cập nhật cửa hàng", description = "Cập nhật thông tin của cửa hàng theo ID")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<MessageResponse>> updateCuaHang(@PathVariable Long id, @Valid @RequestBody CuaHangRequest request) {
         cuaHangService.updateCuaHang(id, request);
@@ -57,6 +63,7 @@ public class CuaHangController {
     /**
      * DELETE /cuahang/{id} — Xóa cửa hàng
      */
+    @Operation(summary = "Xóa cửa hàng", description = "Xóa cửa hàng khỏi hệ thống theo ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<MessageResponse>> deleteCuaHang(@PathVariable Long id) {
         cuaHangService.deleteCuaHang(id);
@@ -67,6 +74,7 @@ public class CuaHangController {
      * PATCH /cuahang/{id}/status — Thay đổi trạng thái cửa hàng
      * Body: { "trangThai": "HoatDong" | "DongCua" | "TamNgung" }
      */
+    @Operation(summary = "Thay đổi trạng thái cửa hàng", description = "Thay đổi trạng thái hoạt động của cửa hàng")
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApiResponse<MessageResponse>> changeStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String status = body.get("trangThai");

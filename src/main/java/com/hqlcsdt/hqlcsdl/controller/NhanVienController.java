@@ -15,10 +15,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.hqlcsdt.hqlcsdl.dto.response.PageResponse;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/nhan-vien")
 @RequiredArgsConstructor
+@Tag(name = "Nhân viên", description = "Các API quản lý nhân viên và tài khoản")
 public class NhanVienController {
 
     private final NhanVienService nhanVienService;
@@ -27,6 +29,7 @@ public class NhanVienController {
      * GET /nhan-vien
      * Lấy danh sách nhân viên có phân trang và filter
      */
+    @Operation(summary = "Lấy tất cả nhân viên", description = "Lấy danh sách nhân viên có phân trang và filter")
     @GetMapping
     public ResponseEntity<ApiResponse<PageResponse<NhanVienResponse>>> getAllNhanVien(
             @AuthenticationPrincipal JwtUserPrincipal principal,
@@ -44,6 +47,7 @@ public class NhanVienController {
      * GET /nhan-vien/{manv}
      * Lấy thông tin chi tiết nhân viên
      */
+    @Operation(summary = "Lấy chi tiết nhân viên", description = "Lấy thông tin chi tiết nhân viên theo mã nhân viên")
     @GetMapping("/{manv}")
     public ResponseEntity<ApiResponse<NhanVienResponse>> getNhanVienById(
             @AuthenticationPrincipal JwtUserPrincipal principal,
@@ -55,6 +59,7 @@ public class NhanVienController {
      * POST /nhan-vien
      * Thêm nhân viên mới + tự động tạo TAIKHOAN
      */
+    @Operation(summary = "Thêm nhân viên", description = "Thêm nhân viên mới và tự động tạo tài khoản tương ứng")
     @PostMapping
     public ResponseEntity<ApiResponse<MessageResponse>> createNhanVien(
             @AuthenticationPrincipal JwtUserPrincipal principal,
@@ -67,6 +72,7 @@ public class NhanVienController {
      * PUT /nhan-vien/{manv}
      * Cập nhật thông tin nhân viên
      */
+    @Operation(summary = "Cập nhật nhân viên", description = "Cập nhật thông tin nhân viên theo mã nhân viên")
     @PutMapping("/{manv}")
     public ResponseEntity<ApiResponse<MessageResponse>> updateNhanVien(
             @AuthenticationPrincipal JwtUserPrincipal principal,
@@ -80,6 +86,7 @@ public class NhanVienController {
      * DELETE /nhan-vien/{manv}
      * Vô hiệu hóa nhân viên (TRANGTHAI = KhoaCung)
      */
+    @Operation(summary = "Vô hiệu hóa nhân viên", description = "Chuyển trạng thái tài khoản của nhân viên thành khóa cứng")
     @DeleteMapping("/{manv}")
     public ResponseEntity<ApiResponse<MessageResponse>> disableNhanVien(
             @AuthenticationPrincipal JwtUserPrincipal principal,
@@ -92,6 +99,7 @@ public class NhanVienController {
      * PUT /nhan-vien/{manv}/tai-khoan/role
      * Cập nhật nhóm quyền (Role) cho tài khoản
      */
+    @Operation(summary = "Cập nhật quyền", description = "Thay đổi nhóm quyền cho tài khoản nhân viên")
     @PutMapping("/{manv}/tai-khoan/role")
     public ResponseEntity<ApiResponse<MessageResponse>> updateRole(
             @AuthenticationPrincipal JwtUserPrincipal principal,
@@ -109,6 +117,7 @@ public class NhanVienController {
      * PUT /nhan-vien/{manv}/tai-khoan/trang-thai
      * Cập nhật trạng thái tài khoản (HoatDong, KhoaCung, KhoaTam)
      */
+    @Operation(summary = "Cập nhật trạng thái tài khoản", description = "Cập nhật trạng thái của tài khoản (HoatDong, KhoaCung, KhoaTam)")
     @PutMapping("/{manv}/tai-khoan/trang-thai")
     public ResponseEntity<ApiResponse<MessageResponse>> updateStatus(
             @AuthenticationPrincipal JwtUserPrincipal principal,
