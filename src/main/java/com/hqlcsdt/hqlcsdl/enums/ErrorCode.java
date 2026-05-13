@@ -28,6 +28,7 @@ public enum ErrorCode {
     // === 404 Not Found ===
     EMPLOYEE_NOT_FOUND("EMPLOYEE_NOT_FOUND", "Mã nhân viên không tồn tại", 404),
     ACCOUNT_NOT_FOUND("ACCOUNT_NOT_FOUND", "Tài khoản không tồn tại", 404),
+    STORE_NOT_FOUND("STORE_NOT_FOUND", "Cửa hàng không tồn tại", 404),
     RESOURCE_NOT_FOUND("RESOURCE_NOT_FOUND", "Không tìm thấy tài nguyên", 404),
 
     // === 500 Internal Server Error ===

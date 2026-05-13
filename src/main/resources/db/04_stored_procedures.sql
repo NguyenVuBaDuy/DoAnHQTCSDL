@@ -191,3 +191,103 @@ END sp_huy_hoa_don;
 /
 
 PROMPT === sp_huy_hoa_don: Created ===
+
+-- ============================================================
+-- FILE: sp_insert_cuahang.sql
+-- DESC: Thêm cửa hàng mới
+-- ============================================================
+CREATE OR REPLACE PROCEDURE INSERT_CUAHANG (
+  p_tench           IN  VARCHAR2,
+  p_diachi          IN  VARCHAR2,
+  p_sdt             IN  VARCHAR2,
+  p_email           IN  VARCHAR2,
+  p_ngaykhaitruong  IN  DATE,
+  p_trangthai       IN  VARCHAR2,
+  p_mach            OUT NUMBER
+) AS
+BEGIN
+  INSERT INTO CUAHANG (TENCH, DIACHI, SDT, EMAIL, NGAYKHAITRUONG, TRANGTHAI)
+  VALUES (p_tench, p_diachi, p_sdt, p_email, p_ngaykhaitruong, p_trangthai)
+  RETURNING MACH INTO p_mach;
+  COMMIT;
+EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK; 
+    RAISE;
+END INSERT_CUAHANG;
+/
+
+PROMPT === INSERT_CUAHANG: Created ===
+
+-- ============================================================
+-- FILE: sp_update_cuahang.sql
+-- DESC: Cập nhật thông tin cửa hàng
+-- ============================================================
+CREATE OR REPLACE PROCEDURE UPDATE_CUAHANG (
+  p_mach            IN  NUMBER,
+  p_tench           IN  VARCHAR2,
+  p_diachi          IN  VARCHAR2,
+  p_sdt             IN  VARCHAR2,
+  p_email           IN  VARCHAR2,
+  p_ngaykhaitruong  IN  DATE,
+  p_trangthai       IN  VARCHAR2
+) AS
+BEGIN
+  UPDATE CUAHANG
+  SET TENCH = p_tench,
+      DIACHI = p_diachi,
+      SDT = p_sdt,
+      EMAIL = p_email,
+      NGAYKHAITRUONG = p_ngaykhaitruong,
+      TRANGTHAI = p_trangthai
+  WHERE MACH = p_mach;
+  COMMIT;
+EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK;
+    RAISE;
+END UPDATE_CUAHANG;
+/
+
+PROMPT === UPDATE_CUAHANG: Created ===
+
+-- ============================================================
+-- FILE: sp_delete_cuahang.sql
+-- DESC: Xóa cửa hàng
+-- ============================================================
+CREATE OR REPLACE PROCEDURE DELETE_CUAHANG (
+  p_mach IN NUMBER
+) AS
+BEGIN
+  DELETE FROM CUAHANG WHERE MACH = p_mach;
+  COMMIT;
+EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK;
+    RAISE;
+END DELETE_CUAHANG;
+/
+
+PROMPT === DELETE_CUAHANG: Created ===
+
+-- ============================================================
+-- FILE: sp_change_status_cuahang.sql
+-- DESC: Thay đổi trạng thái cửa hàng
+-- ============================================================
+CREATE OR REPLACE PROCEDURE CHANGE_STATUS_CUAHANG (
+  p_mach      IN NUMBER,
+  p_trangthai IN VARCHAR2
+) AS
+BEGIN
+  UPDATE CUAHANG
+  SET TRANGTHAI = p_trangthai
+  WHERE MACH = p_mach;
+  COMMIT;
+EXCEPTION
+  WHEN OTHERS THEN
+    ROLLBACK;
+    RAISE;
+END CHANGE_STATUS_CUAHANG;
+/
+
+PROMPT === CHANGE_STATUS_CUAHANG: Created ===
