@@ -16,7 +16,7 @@ public enum ErrorCode {
 
     // === 401 Unauthorized ===
     AUTHENTICATION_REQUIRED("AUTHENTICATION_REQUIRED", "Bạn cần đăng nhập", 401),
-    WRONG_PASSWORD("WRONG_PASSWORD", "Sai mật khẩu", 401),
+    WRONG_CREDENTIALS("WRONG_CREDENTIALS", "Sai mã nhân viên hoặc mật khẩu", 401),
     TOKEN_EXPIRED("TOKEN_EXPIRED", "Token đã hết hạn", 401),
     TOKEN_INVALID("TOKEN_INVALID", "Token không hợp lệ", 401),
 

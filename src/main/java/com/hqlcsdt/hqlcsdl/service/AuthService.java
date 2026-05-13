@@ -38,11 +38,11 @@ public class AuthService {
     public LoginResponse login(LoginRequest request) {
         // 1. Tìm tài khoản theo MANV (JOIN FETCH nhom + nhanVien + cuaHang)
         TaiKhoan taiKhoan = taiKhoanRepository.findByManvWithDetails(request.getManv())
-                .orElseThrow(() -> new AppException(ErrorCode.EMPLOYEE_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.WRONG_CREDENTIALS));
 
         // 2. Kiểm tra password
         if (!passwordEncoder.matches(request.getPassword(), taiKhoan.getPassword())) {
-            throw new AppException(ErrorCode.WRONG_PASSWORD);
+            throw new AppException(ErrorCode.WRONG_CREDENTIALS);
         }
 
         // 3. Kiểm tra trạng thái tài khoản
