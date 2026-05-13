@@ -396,3 +396,160 @@ END CHANGE_STATUS_CUAHANG;
 /
 
 PROMPT === CHANGE_STATUS_CUAHANG: Created ===
+
+-- ==========================================
+-- 5. THÊM NHÂN VIÊN (TẠO CẢ TÀI KHOẢN)
+-- ==========================================
+CREATE OR REPLACE PROCEDURE INSERT_NHANVIEN (
+    p_MACH      IN NUMBER,
+    p_CCCD      IN VARCHAR2,
+    p_HOTEN     IN VARCHAR2,
+    p_NGAYSINH  IN DATE,
+    p_GIOITINH  IN VARCHAR2,
+    p_SDT       IN VARCHAR2,
+    p_DIACHI    IN VARCHAR2,
+    p_CHUCVU    IN VARCHAR2,
+    p_MANHOM    IN NUMBER,
+    p_PASSWORD  IN VARCHAR2,
+    p_TRANGTHAI IN VARCHAR2
+)
+AS
+    v_manv VARCHAR2(20);
+    v_count NUMBER;
+BEGIN
+    -- Kiểm tra họ tên
+    IF p_HOTEN IS NULL OR TRIM(p_HOTEN) IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20021, 'Ho ten khong duoc de trong');
+    END IF;
+
+    -- Kiểm tra CCCD
+    IF p_CCCD IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_count FROM NHANVIEN WHERE CCCD = p_CCCD;
+        IF v_count > 0 THEN
+            RAISE_APPLICATION_ERROR(-20022, 'CCCD da ton tai');
+        END IF;
+    END IF;
+
+    -- Kiểm tra Nhóm
+    SELECT COUNT(*) INTO v_count FROM NHOM WHERE MANHOM = p_MANHOM;
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20023, 'Nhom quyen khong ton tai');
+    END IF;
+
+    -- Nếu có MACH thì kiểm tra cửa hàng
+    IF p_MACH IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_count FROM CUAHANG WHERE MACH = p_MACH;
+        IF v_count = 0 THEN
+            RAISE_APPLICATION_ERROR(-20010, 'Cua hang khong ton tai');
+        END IF;
+    END IF;
+
+    -- Insert NHANVIEN và lấy MANV
+    INSERT INTO NHANVIEN (MACH, CCCD, HOTEN, NGAYSINH, GIOITINH, SDT, DIACHI, CHUCVU)
+    VALUES (p_MACH, p_CCCD, p_HOTEN, p_NGAYSINH, p_GIOITINH, p_SDT, p_DIACHI, p_CHUCVU)
+    RETURNING MANV INTO v_manv;
+
+    -- Insert TAIKHOAN
+    INSERT INTO TAIKHOAN (MANHOM, MANV, PASSWORD, TRANGTHAI)
+    VALUES (p_MANHOM, v_manv, p_PASSWORD, NVL(p_TRANGTHAI, 'HoatDong'));
+
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Them nhan vien thanh cong: ' || v_manv);
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END INSERT_NHANVIEN;
+/
+
+PROMPT === INSERT_NHANVIEN: Created ===
+
+-- ==========================================
+-- 6. CẬP NHẬT NHÂN VIÊN
+-- ==========================================
+CREATE OR REPLACE PROCEDURE UPDATE_NHANVIEN (
+    p_MANV      IN VARCHAR2,
+    p_MACH      IN NUMBER,
+    p_CCCD      IN VARCHAR2,
+    p_HOTEN     IN VARCHAR2,
+    p_NGAYSINH  IN DATE,
+    p_GIOITINH  IN VARCHAR2,
+    p_SDT       IN VARCHAR2,
+    p_DIACHI    IN VARCHAR2,
+    p_CHUCVU    IN VARCHAR2
+)
+AS
+    v_count NUMBER;
+BEGIN
+    -- Kiểm tra NV tồn tại
+    SELECT COUNT(*) INTO v_count FROM NHANVIEN WHERE MANV = p_MANV;
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20020, 'Nhan vien khong ton tai');
+    END IF;
+
+    -- Kiểm tra họ tên
+    IF p_HOTEN IS NULL OR TRIM(p_HOTEN) IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20021, 'Ho ten khong duoc de trong');
+    END IF;
+
+    -- Kiểm tra CCCD trùng
+    IF p_CCCD IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_count FROM NHANVIEN WHERE CCCD = p_CCCD AND MANV != p_MANV;
+        IF v_count > 0 THEN
+            RAISE_APPLICATION_ERROR(-20022, 'CCCD da ton tai');
+        END IF;
+    END IF;
+
+    -- Update NHANVIEN
+    UPDATE NHANVIEN
+    SET MACH = p_MACH,
+        CCCD = p_CCCD,
+        HOTEN = p_HOTEN,
+        NGAYSINH = p_NGAYSINH,
+        GIOITINH = p_GIOITINH,
+        SDT = p_SDT,
+        DIACHI = p_DIACHI,
+        CHUCVU = p_CHUCVU
+    WHERE MANV = p_MANV;
+
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Cap nhat nhan vien thanh cong');
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END UPDATE_NHANVIEN;
+/
+
+PROMPT === UPDATE_NHANVIEN: Created ===
+
+-- ==========================================
+-- 7. VÔ HIỆU HÓA NHÂN VIÊN
+-- ==========================================
+CREATE OR REPLACE PROCEDURE DISABLE_NHANVIEN (
+    p_MANV IN VARCHAR2
+)
+AS
+    v_count NUMBER;
+BEGIN
+    -- Kiểm tra TK tồn tại
+    SELECT COUNT(*) INTO v_count FROM TAIKHOAN WHERE MANV = p_MANV;
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20020, 'Nhan vien khong ton tai');
+    END IF;
+
+    -- Update TRANGTHAI TAIKHOAN = KhoaCung
+    UPDATE TAIKHOAN
+    SET TRANGTHAI = 'KhoaCung'
+    WHERE MANV = p_MANV;
+
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Vo hieu hoa nhan vien thanh cong');
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END DISABLE_NHANVIEN;
+/
+
+PROMPT === DISABLE_NHANVIEN: Created ===
