@@ -48,6 +48,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+    @ExceptionHandler(org.springframework.data.mapping.PropertyReferenceException.class)
+    public ResponseEntity<ErrorResponse> handlePropertyReferenceException(org.springframework.data.mapping.PropertyReferenceException ex) {
+        String message = "Thuộc tính sắp xếp không hợp lệ: " + ex.getPropertyName();
+        String propName = ex.getPropertyName();
+        // Đặc biệt xử lý lỗi Swagger khi placeholder là ["string"] hoặc []
+        if (propName != null && (propName.contains("string") || propName.contains("[") || propName.contains("]"))) {
+            message = "Lỗi do Swagger gửi chuỗi mảng rác (như ['string'] hoặc []) vào ô sort. Vui lòng xóa trắng hoàn toàn ô sort trên Swagger UI nếu không muốn sắp xếp.";
+        }
+        ErrorResponse body = new ErrorResponse(message, ErrorCode.INVALID_INPUT.getCode());
+        return ResponseEntity.badRequest().body(body);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
         log.error("Lỗi không mong muốn: ", ex);

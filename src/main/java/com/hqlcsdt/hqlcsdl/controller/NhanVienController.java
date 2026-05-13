@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.hqlcsdt.hqlcsdl.dto.response.PageResponse;
+
 @RestController
 @RequestMapping("/nhan-vien")
 @RequiredArgsConstructor
@@ -26,7 +28,7 @@ public class NhanVienController {
      * Lấy danh sách nhân viên có phân trang và filter
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<NhanVienResponse>>> getAllNhanVien(
+    public ResponseEntity<ApiResponse<PageResponse<NhanVienResponse>>> getAllNhanVien(
             @AuthenticationPrincipal JwtUserPrincipal principal,
             @RequestParam(required = false) Long mach,
             @RequestParam(required = false) String chucvu,
@@ -35,7 +37,7 @@ public class NhanVienController {
             Pageable pageable) {
         
         Page<NhanVienResponse> result = nhanVienService.searchNhanVien(principal, mach, chucvu, trangthai, search, pageable);
-        return ResponseEntity.ok(ApiResponse.success(result));
+        return ResponseEntity.ok(ApiResponse.success(PageResponse.of(result)));
     }
 
     /**
@@ -84,5 +86,39 @@ public class NhanVienController {
             @PathVariable String manv) {
         nhanVienService.disableNhanVien(principal, manv);
         return ResponseEntity.ok(ApiResponse.success(new MessageResponse("Vô hiệu hóa nhân viên thành công")));
+    }
+
+    /**
+     * PUT /nhan-vien/{manv}/tai-khoan/role
+     * Cập nhật nhóm quyền (Role) cho tài khoản
+     */
+    @PutMapping("/{manv}/tai-khoan/role")
+    public ResponseEntity<ApiResponse<MessageResponse>> updateRole(
+            @AuthenticationPrincipal JwtUserPrincipal principal,
+            @PathVariable String manv,
+            @RequestBody java.util.Map<String, Long> body) {
+        Long maNhom = body.get("maNhom");
+        if (maNhom == null) {
+            throw new IllegalArgumentException("maNhom không được để trống");
+        }
+        nhanVienService.updateRole(principal, manv, maNhom);
+        return ResponseEntity.ok(ApiResponse.success(new MessageResponse("Cập nhật quyền thành công")));
+    }
+
+    /**
+     * PUT /nhan-vien/{manv}/tai-khoan/trang-thai
+     * Cập nhật trạng thái tài khoản (HoatDong, KhoaCung, KhoaTam)
+     */
+    @PutMapping("/{manv}/tai-khoan/trang-thai")
+    public ResponseEntity<ApiResponse<MessageResponse>> updateStatus(
+            @AuthenticationPrincipal JwtUserPrincipal principal,
+            @PathVariable String manv,
+            @RequestBody java.util.Map<String, String> body) {
+        String status = body.get("trangThai");
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("trangThai không được để trống");
+        }
+        nhanVienService.updateStatus(principal, manv, status);
+        return ResponseEntity.ok(ApiResponse.success(new MessageResponse("Cập nhật trạng thái thành công")));
     }
 }

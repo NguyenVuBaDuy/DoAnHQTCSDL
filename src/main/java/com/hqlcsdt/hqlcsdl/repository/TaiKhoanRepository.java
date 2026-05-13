@@ -8,8 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
 @Repository
-public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, Long> {
+public interface TaiKhoanRepository extends JpaRepository<TaiKhoan, Long>, JpaSpecificationExecutor<TaiKhoan> {
 
     /**
      * Tìm tài khoản theo MANV — JOIN FETCH NHOM + NHANVIEN để tránh N+1.
