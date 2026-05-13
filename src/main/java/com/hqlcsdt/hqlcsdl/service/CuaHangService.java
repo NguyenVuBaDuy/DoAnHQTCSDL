@@ -6,13 +6,12 @@ import com.hqlcsdt.hqlcsdl.enums.ErrorCode;
 import com.hqlcsdt.hqlcsdl.exception.AppException;
 import com.hqlcsdt.hqlcsdl.repository.CuaHangRepository;
 import com.hqlcsdt.hqlcsdl.utils.StoredProcedureUtils;
-import jakarta.persistence.ParameterMode;
-import jakarta.persistence.StoredProcedureQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -21,96 +20,76 @@ import java.util.List;
 public class CuaHangService {
 
     private final CuaHangRepository cuaHangRepository;
-    private final StoredProcedureUtils storedProcedureUtils;
+    private final StoredProcedureUtils sp;
 
+    /**
+     * Lấy danh sách tất cả cửa hàng.
+     */
     public List<CuaHang> getAllCuaHang() {
         return cuaHangRepository.findAll();
     }
 
+    /**
+     * Lấy thông tin cửa hàng theo mã.
+     */
     public CuaHang getCuaHangById(Long mach) {
         return cuaHangRepository.findById(mach)
                 .orElseThrow(() -> new AppException(ErrorCode.STORE_NOT_FOUND));
     }
 
+    /**
+     * Thêm cửa hàng mới — gọi procedure INSERT_CUAHANG.
+     * Procedure tự validate: trùng SĐT, trùng email, trạng thái hợp lệ.
+     */
     @Transactional
-    public CuaHang createCuaHang(CuaHangRequest request) {
-        StoredProcedureQuery query = storedProcedureUtils.createQuery("INSERT_CUAHANG");
-        
-        query.registerStoredProcedureParameter("p_tench", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_diachi", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_sdt", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_email", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_ngaykhaitruong", java.time.LocalDate.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_trangthai", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_mach", Long.class, ParameterMode.OUT);
-
-        query.setParameter("p_tench", request.getTenCh());
-        query.setParameter("p_diachi", request.getDiaChi());
-        query.setParameter("p_sdt", request.getSdt());
-        query.setParameter("p_email", request.getEmail());
-        query.setParameter("p_ngaykhaitruong", request.getNgayKhaiTruong());
-        query.setParameter("p_trangthai", request.getTrangThai());
-
-        query.execute();
-
-        Number machNumber = (Number) query.getOutputParameterValue("p_mach");
-        Long mach = machNumber.longValue();
-
-        return getCuaHangById(mach);
+    public void createCuaHang(CuaHangRequest request) {
+        sp.call("INSERT_CUAHANG")
+                .input("p_TENCH", request.getTenCh(), String.class)
+                .input("p_DIACHI", request.getDiaChi(), String.class)
+                .input("p_SDT", request.getSdt(), String.class)
+                .input("p_EMAIL", request.getEmail(), String.class)
+                .input("p_NGAYKHAITRUONG", request.getNgayKhaiTruong(), LocalDate.class)
+                .input("p_TRANGTHAI", request.getTrangThai(), String.class)
+                .execute();
     }
 
+    /**
+     * Cập nhật thông tin cửa hàng — gọi procedure UPDATE_CUAHANG.
+     * Procedure tự validate: tồn tại, trùng SĐT/email với cửa hàng khác, trạng thái hợp lệ.
+     */
     @Transactional
-    public CuaHang updateCuaHang(Long mach, CuaHangRequest request) {
-        // Validate existence
-        getCuaHangById(mach);
-
-        StoredProcedureQuery query = storedProcedureUtils.createQuery("UPDATE_CUAHANG");
-
-        query.registerStoredProcedureParameter("p_mach", Long.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_tench", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_diachi", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_sdt", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_email", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_ngaykhaitruong", java.time.LocalDate.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_trangthai", String.class, ParameterMode.IN);
-
-        query.setParameter("p_mach", mach);
-        query.setParameter("p_tench", request.getTenCh());
-        query.setParameter("p_diachi", request.getDiaChi());
-        query.setParameter("p_sdt", request.getSdt());
-        query.setParameter("p_email", request.getEmail());
-        query.setParameter("p_ngaykhaitruong", request.getNgayKhaiTruong());
-        query.setParameter("p_trangthai", request.getTrangThai());
-
-        query.execute();
-
-        return getCuaHangById(mach);
+    public void updateCuaHang(Long mach, CuaHangRequest request) {
+        sp.call("UPDATE_CUAHANG")
+                .input("p_MACH", mach, Long.class)
+                .input("p_TENCH", request.getTenCh(), String.class)
+                .input("p_DIACHI", request.getDiaChi(), String.class)
+                .input("p_SDT", request.getSdt(), String.class)
+                .input("p_EMAIL", request.getEmail(), String.class)
+                .input("p_NGAYKHAITRUONG", request.getNgayKhaiTruong(), LocalDate.class)
+                .input("p_TRANGTHAI", request.getTrangThai(), String.class)
+                .execute();
     }
 
+    /**
+     * Xóa cửa hàng — gọi procedure DELETE_CUAHANG.
+     * Procedure tự validate: tồn tại, còn nhân viên, còn tồn kho.
+     */
     @Transactional
     public void deleteCuaHang(Long mach) {
-        // Validate existence
-        getCuaHangById(mach);
-
-        StoredProcedureQuery query = storedProcedureUtils.createQuery("DELETE_CUAHANG");
-        query.registerStoredProcedureParameter("p_mach", Long.class, ParameterMode.IN);
-        query.setParameter("p_mach", mach);
-
-        query.execute();
+        sp.call("DELETE_CUAHANG")
+                .input("p_MACH", mach, Long.class)
+                .execute();
     }
 
+    /**
+     * Thay đổi trạng thái cửa hàng — gọi procedure CHANGE_STATUS_CUAHANG.
+     * Procedure tự validate: tồn tại, trạng thái hợp lệ.
+     */
     @Transactional
-    public void changeStatus(Long mach, String status) {
-        // Validate existence
-        getCuaHangById(mach);
-
-        StoredProcedureQuery query = storedProcedureUtils.createQuery("CHANGE_STATUS_CUAHANG");
-        query.registerStoredProcedureParameter("p_mach", Long.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("p_trangthai", String.class, ParameterMode.IN);
-        
-        query.setParameter("p_mach", mach);
-        query.setParameter("p_trangthai", status);
-
-        query.execute();
+    public void changeStatus(Long mach, String trangThai) {
+        sp.call("CHANGE_STATUS_CUAHANG")
+                .input("p_MACH", mach, Long.class)
+                .input("p_TRANGTHAI", trangThai, String.class)
+                .execute();
     }
 }

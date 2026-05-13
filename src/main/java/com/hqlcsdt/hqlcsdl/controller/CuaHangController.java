@@ -8,7 +8,6 @@ import com.hqlcsdt.hqlcsdl.service.CuaHangService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,42 +20,56 @@ public class CuaHangController {
 
     private final CuaHangService cuaHangService;
 
+    /**
+     * GET /cuahang — Lấy danh sách tất cả cửa hàng
+     */
     @GetMapping
     public ResponseEntity<ApiResponse<List<CuaHang>>> getAllCuaHang() {
         return ResponseEntity.ok(ApiResponse.success(cuaHangService.getAllCuaHang()));
     }
 
+    /**
+     * GET /cuahang/{id} — Lấy thông tin cửa hàng theo mã
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CuaHang>> getCuaHangById(@PathVariable Long id) {
         return ResponseEntity.ok(ApiResponse.success(cuaHangService.getCuaHangById(id)));
     }
 
+    /**
+     * POST /cuahang — Thêm cửa hàng mới
+     */
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('Admin', 'QuanLyCuaHang')")
-    public ResponseEntity<ApiResponse<CuaHang>> createCuaHang(@Valid @RequestBody CuaHangRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(cuaHangService.createCuaHang(request)));
+    public ResponseEntity<ApiResponse<MessageResponse>> createCuaHang(@Valid @RequestBody CuaHangRequest request) {
+        cuaHangService.createCuaHang(request);
+        return ResponseEntity.ok(ApiResponse.success(new MessageResponse("Thêm cửa hàng thành công")));
     }
 
+    /**
+     * PUT /cuahang/{id} — Cập nhật thông tin cửa hàng
+     */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyAuthority('Admin', 'QuanLyCuaHang')")
-    public ResponseEntity<ApiResponse<CuaHang>> updateCuaHang(@PathVariable Long id, @Valid @RequestBody CuaHangRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(cuaHangService.updateCuaHang(id, request)));
+    public ResponseEntity<ApiResponse<MessageResponse>> updateCuaHang(@PathVariable Long id, @Valid @RequestBody CuaHangRequest request) {
+        cuaHangService.updateCuaHang(id, request);
+        return ResponseEntity.ok(ApiResponse.success(new MessageResponse("Cập nhật cửa hàng thành công")));
     }
 
+    /**
+     * DELETE /cuahang/{id} — Xóa cửa hàng
+     */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('Admin')")
     public ResponseEntity<ApiResponse<MessageResponse>> deleteCuaHang(@PathVariable Long id) {
         cuaHangService.deleteCuaHang(id);
         return ResponseEntity.ok(ApiResponse.success(new MessageResponse("Xóa cửa hàng thành công")));
     }
 
+    /**
+     * PATCH /cuahang/{id}/status — Thay đổi trạng thái cửa hàng
+     * Body: { "trangThai": "HoatDong" | "DongCua" | "TamNgung" }
+     */
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyAuthority('Admin', 'QuanLyCuaHang')")
     public ResponseEntity<ApiResponse<MessageResponse>> changeStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String status = body.get("trangThai");
-        if (status == null || status.isBlank()) {
-            throw new IllegalArgumentException("Trạng thái không được để trống");
-        }
         cuaHangService.changeStatus(id, status);
         return ResponseEntity.ok(ApiResponse.success(new MessageResponse("Thay đổi trạng thái thành công")));
     }
