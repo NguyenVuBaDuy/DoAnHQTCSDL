@@ -4,7 +4,8 @@ import lombok.Getter;
 
 /**
  * Enum chứa tất cả mã lỗi và message mặc định của hệ thống.
- * Mỗi ErrorCode gồm: code (String dùng cho frontend), message (tiếng Việt), httpStatus.
+ * Mỗi ErrorCode gồm: code (String dùng cho frontend), message (tiếng Việt),
+ * httpStatus.
  */
 @Getter
 public enum ErrorCode {
@@ -29,6 +30,7 @@ public enum ErrorCode {
     EMPLOYEE_NOT_FOUND("EMPLOYEE_NOT_FOUND", "Mã nhân viên không tồn tại", 404),
     ACCOUNT_NOT_FOUND("ACCOUNT_NOT_FOUND", "Tài khoản không tồn tại", 404),
     STORE_NOT_FOUND("STORE_NOT_FOUND", "Cửa hàng không tồn tại", 404),
+    SUPPLIER_NOT_FOUND("SUPPLIER_NOT_FOUND", "Nhà cung cấp không tồn tại", 404),
     RESOURCE_NOT_FOUND("RESOURCE_NOT_FOUND", "Không tìm thấy tài nguyên", 404),
 
     // === 500 Internal Server Error ===
