@@ -33,6 +33,10 @@ public enum ErrorCode {
     CUSTOMER_NOT_FOUND("CUSTOMER_NOT_FOUND", "Khách hàng không tồn tại", 404),
     CUSTOMER_PHONE_EXISTS("CUSTOMER_PHONE_EXISTS", "Số điện thoại đã được sử dụng", 400),
     CUSTOMER_EMAIL_EXISTS("CUSTOMER_EMAIL_EXISTS", "Email đã được sử dụng", 400),
+    FILE_REQUIRED("FILE_REQUIRED", "Vui lòng chọn file ảnh", 400),
+    FILE_TOO_LARGE("FILE_TOO_LARGE", "File ảnh vượt quá dung lượng cho phép", 400),
+    INVALID_FILE_TYPE("INVALID_FILE_TYPE", "Chỉ chấp nhận file ảnh JPEG, PNG hoặc WebP", 400),
+    UPLOAD_FAILED("UPLOAD_FAILED", "Upload ảnh thất bại, vui lòng thử lại", 500),
     SUPPLIER_NOT_FOUND("SUPPLIER_NOT_FOUND", "Nhà cung cấp không tồn tại", 404),
     RESOURCE_NOT_FOUND("RESOURCE_NOT_FOUND", "Không tìm thấy tài nguyên", 404),
 
