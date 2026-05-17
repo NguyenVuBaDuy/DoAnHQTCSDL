@@ -1,0 +1,44 @@
+spring.application.name=hqlcsdl
+
+spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/XE
+spring.datasource.username=your_db_username
+spring.datasource.password=your_db_password
+spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+
+
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.database-platform=org.hibernate.dialect.OracleDialect
+
+
+# ============================================================
+# JWT Configuration
+# ============================================================
+jwt.access-token-secret=your_access_token_secret_here
+jwt.refresh-token-secret=your_refresh_token_secret_here
+jwt.access-token-expires=900000
+jwt.refresh-token-expires=604800000
+
+server.port=8080
+
+# ============================================================
+# Database auto-init (chạy SQL tự động lần đầu khi chưa có bảng)
+# ============================================================
+# true  = Tự động chạy file SQL khi chưa có table nào trong DB
+# false = Tắt hoàn toàn, tự chạy SQL bằng tay
+app.db.init.enabled=true
+
+# ============================================================
+# ⚠️  RESET DATABASE — CHỈ DÙNG KHI CẦN XÓA TOÀN BỘ DỮ LIỆU
+# ============================================================
+# true  = XÓA TẤT CẢ tables, sequences, triggers, procedures,
+#         functions rồi TẠO LẠI TỪ ĐẦU (như lần đầu chạy)
+# false = Không làm gì (chế độ bình thường)
+#
+# ⚠️  CẢNH BÁO: Sau khi reset xong, HÃY ĐẶT LẠI = false NGAY!
+#     Nếu quên, lần chạy tiếp theo sẽ BỊ RESET LẠI toàn bộ dữ liệu!
+app.db.reset=false
+
+# Tắt Spring SQL init mặc định (dùng DatabaseInitializer thay thế)
+spring.sql.init.mode=never
