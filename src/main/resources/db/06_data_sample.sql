@@ -111,24 +111,88 @@ COMMIT;
 -- =========================
 -- 3. DANH MỤC SẢN PHẨM
 -- PK: MADM — auto identity
--- Identity values: 1,2,3 (cấp 1) → 4,5 (cấp 2)
+-- Identity values: 1..5 (cấp 1) → 6..25 (cấp 2)
 -- =========================
 -- Cấp 1
 INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
-VALUES (NULL, 'Điện thoại', 'Smartphone các hãng');                -- MADM = 1
+VALUES (NULL, 'Điện tử, Viễn thông', 'Các thiết bị điện tử phục vụ nhu cầu liên lạc, giải trí và làm việc di động.');   -- MADM = 1
 
 INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
-VALUES (NULL, 'Laptop', 'Laptop văn phòng và gaming');              -- MADM = 2
+VALUES (NULL, 'Phụ kiện', 'Các phụ kiện hỗ trợ và nâng cao trải nghiệm sử dụng thiết bị điện tử.');                    -- MADM = 2
 
 INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
-VALUES (NULL, 'Phụ kiện', 'Ốp lưng, sạc, tai nghe');              -- MADM = 3
-
--- Cấp 2 (tham chiếu MADM cấp 1 bằng NUMBER)
-INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
-VALUES (1, 'iPhone', 'Dòng điện thoại Apple');                     -- MADM = 4
+VALUES (NULL, 'Điện tử, Điện máy', 'Thiết bị điện tử gia đình phục vụ giải trí và công việc tại nhà.');                 -- MADM = 3
 
 INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
-VALUES (1, 'Samsung Galaxy', 'Dòng điện thoại Samsung');           -- MADM = 5
+VALUES (NULL, 'Điện gia dụng', 'Thiết bị điện phục vụ nhu cầu sinh hoạt hàng ngày trong gia đình.');                     -- MADM = 4
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (NULL, 'Làm đẹp & Chăm sóc cá nhân', 'Thiết bị điện hỗ trợ chăm sóc sắc đẹp và vệ sinh cá nhân hàng ngày.');   -- MADM = 5
+
+-- Cấp 2 — Điện tử, Viễn thông (MADM_CHA = 1)
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (1, 'Điện thoại', 'Điện thoại thông minh.');                                        -- MADM = 6
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (1, 'Máy tính bảng', 'Tablet phù hợp học tập, giải trí và làm việc.');              -- MADM = 7
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (1, 'Laptop', 'Máy tính xách tay văn phòng, gaming và đồ họa.');                    -- MADM = 8
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (1, 'Đồng hồ thông minh', 'Smartwatch theo dõi sức khỏe và thông báo.');            -- MADM = 9
+
+-- Cấp 2 — Phụ kiện (MADM_CHA = 2)
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (2, 'Tai nghe', 'Tai nghe có dây, không dây, chống ồn ANC.');                       -- MADM = 10
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (2, 'Loa', 'Loa bluetooth, loa vi tính, loa soundbar.');                            -- MADM = 11
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (2, 'Pin dự phòng', 'Pin sạc dự phòng dung lượng cao, sạc nhanh.');                 -- MADM = 12
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (2, 'Bàn phím & Chuột', 'Bàn phím cơ, bàn phím văn phòng, chuột gaming.');         -- MADM = 13
+
+-- Cấp 2 — Điện tử, Điện máy (MADM_CHA = 3)
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (3, 'Tivi', 'Tivi LED, OLED, QLED các kích thước và thương hiệu.');                 -- MADM = 14
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (3, 'Máy lạnh', 'Máy lạnh inverter, máy lạnh 1 chiều, 2 chiều các công suất.');     -- MADM = 15
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (3, 'Máy giặt', 'Máy giặt cửa trước, cửa trên, máy giặt sấy kết hợp.');           -- MADM = 16
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (3, 'Tủ lạnh', 'Tủ lạnh mini, tủ lạnh side-by-side, tủ lạnh inverter tiết kiệm điện.'); -- MADM = 17
+
+-- Cấp 2 — Điện gia dụng (MADM_CHA = 4)
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (4, 'Nồi cơm điện', 'Nồi cơm điện tử, nồi áp suất điện các dung tích.');           -- MADM = 18
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (4, 'Máy lọc nước', 'Máy lọc nước RO, máy lọc để bàn và gắn vòi.');                -- MADM = 19
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (4, 'Quạt điện', 'Quạt đứng, quạt treo tường, quạt điều hòa hơi nước.');           -- MADM = 20
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (4, 'Máy lọc không khí', 'Máy lọc không khí diệt khuẩn, khử mùi.');                -- MADM = 21
+
+-- Cấp 2 — Làm đẹp & Chăm sóc cá nhân (MADM_CHA = 5)
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (5, 'Máy sấy tóc', 'Máy sấy tóc ion, công suất cao, chống ẩm.');                   -- MADM = 22
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (5, 'Máy cạo râu', 'Máy cạo râu khô, ướt, có thể giặt được.');                    -- MADM = 23
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (5, 'Bàn chải điện', 'Bàn chải điện làm sạch răng hiệu quả, bảo vệ nướu.');        -- MADM = 24
+
+INSERT INTO "DANHMUCSANPHAM" ("MADM_CHA", "TENDM", "MOTA")
+VALUES (5, 'Máy rửa mặt', 'Máy rửa mặt rung sonic làm sạch sâu lỗ chân lông.');          -- MADM = 25
 
 COMMIT;
 
