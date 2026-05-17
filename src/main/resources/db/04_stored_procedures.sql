@@ -206,7 +206,228 @@ END CHANGE_STATUS_CUAHANG;
 PROMPT === CHANGE_STATUS_CUAHANG: Created ===
 
 -- ==========================================
--- 5. THÊM NHÂN VIÊN (TẠO CẢ TÀI KHOẢN)
+-- 5. THÊM NHÀ CUNG CẤP
+-- ==========================================
+CREATE OR REPLACE PROCEDURE INSERT_NHACUNGCAP (
+    p_TENNCC    IN VARCHAR2,
+    p_DIACHI    IN VARCHAR2,
+    p_SDT       IN VARCHAR2,
+    p_EMAIL     IN VARCHAR2,
+    p_MASOTHUE  IN VARCHAR2,
+    p_TRANGTHAI IN VARCHAR2
+)
+AS
+    v_count NUMBER;
+BEGIN
+    -- Kiểm tra tên nhà cung cấp không được trống
+    IF p_TENNCC IS NULL OR TRIM(p_TENNCC) IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20031, 'Ten nha cung cap khong duoc de trong');
+    END IF;
+
+    -- Kiểm tra trạng thái hợp lệ
+    IF p_TRANGTHAI NOT IN ('HoatDong', 'DungHopTac') THEN
+        RAISE_APPLICATION_ERROR(-20032, 'Trang thai khong hop le. Chi chap nhan: HoatDong, DungHopTac');
+    END IF;
+
+    -- Kiểm tra mã số thuế trùng
+    IF p_MASOTHUE IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_count FROM NHACUNGCAP WHERE MASOTHUE = p_MASOTHUE;
+        IF v_count > 0 THEN
+            RAISE_APPLICATION_ERROR(-20033, 'Ma so thue da ton tai');
+        END IF;
+    END IF;
+
+    -- Kiểm tra số điện thoại trùng
+    IF p_SDT IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_count FROM NHACUNGCAP WHERE SDT = p_SDT;
+        IF v_count > 0 THEN
+            RAISE_APPLICATION_ERROR(-20034, 'So dien thoai da ton tai');
+        END IF;
+    END IF;
+
+    -- Kiểm tra email trùng
+    IF p_EMAIL IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_count FROM NHACUNGCAP WHERE EMAIL = p_EMAIL;
+        IF v_count > 0 THEN
+            RAISE_APPLICATION_ERROR(-20035, 'Email da ton tai');
+        END IF;
+    END IF;
+
+    -- Insert dữ liệu
+    INSERT INTO NHACUNGCAP (TENNCC, DIACHI, SDT, EMAIL, MASOTHUE, TRANGTHAI)
+    VALUES (p_TENNCC, p_DIACHI, p_SDT, p_EMAIL, p_MASOTHUE, p_TRANGTHAI);
+
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Them nha cung cap thanh cong');
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END INSERT_NHACUNGCAP;
+/
+
+PROMPT === INSERT_NHACUNGCAP: Created ===
+
+-- ==========================================
+-- 6. CẬP NHẬT NHÀ CUNG CẤP
+-- ==========================================
+CREATE OR REPLACE PROCEDURE UPDATE_NHACUNGCAP (
+    p_MANCC     IN NUMBER,
+    p_TENNCC    IN VARCHAR2,
+    p_DIACHI    IN VARCHAR2,
+    p_SDT       IN VARCHAR2,
+    p_EMAIL     IN VARCHAR2,
+    p_MASOTHUE  IN VARCHAR2,
+    p_TRANGTHAI IN VARCHAR2
+)
+AS
+    v_count NUMBER;
+BEGIN
+    -- Kiểm tra nhà cung cấp tồn tại
+    SELECT COUNT(*) INTO v_count FROM NHACUNGCAP WHERE MANCC = p_MANCC;
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20030, 'Nha cung cap khong ton tai');
+    END IF;
+
+    -- Kiểm tra tên nhà cung cấp không được trống
+    IF p_TENNCC IS NULL OR TRIM(p_TENNCC) IS NULL THEN
+        RAISE_APPLICATION_ERROR(-20031, 'Ten nha cung cap khong duoc de trong');
+    END IF;
+
+    -- Kiểm tra trạng thái hợp lệ
+    IF p_TRANGTHAI NOT IN ('HoatDong', 'DungHopTac') THEN
+        RAISE_APPLICATION_ERROR(-20032, 'Trang thai khong hop le. Chi chap nhan: HoatDong, DungHopTac');
+    END IF;
+
+    -- Kiểm tra mã số thuế trùng với nhà cung cấp khác
+    IF p_MASOTHUE IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_count FROM NHACUNGCAP WHERE MASOTHUE = p_MASOTHUE AND MANCC != p_MANCC;
+        IF v_count > 0 THEN
+            RAISE_APPLICATION_ERROR(-20033, 'Ma so thue da ton tai');
+        END IF;
+    END IF;
+
+    -- Kiểm tra số điện thoại trùng với nhà cung cấp khác
+    IF p_SDT IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_count FROM NHACUNGCAP WHERE SDT = p_SDT AND MANCC != p_MANCC;
+        IF v_count > 0 THEN
+            RAISE_APPLICATION_ERROR(-20034, 'So dien thoai da ton tai');
+        END IF;
+    END IF;
+
+    -- Kiểm tra email trùng với nhà cung cấp khác
+    IF p_EMAIL IS NOT NULL THEN
+        SELECT COUNT(*) INTO v_count FROM NHACUNGCAP WHERE EMAIL = p_EMAIL AND MANCC != p_MANCC;
+        IF v_count > 0 THEN
+            RAISE_APPLICATION_ERROR(-20035, 'Email da ton tai');
+        END IF;
+    END IF;
+
+    -- Cập nhật dữ liệu
+    UPDATE NHACUNGCAP
+    SET TENNCC    = p_TENNCC,
+        DIACHI    = p_DIACHI,
+        SDT       = p_SDT,
+        EMAIL     = p_EMAIL,
+        MASOTHUE  = p_MASOTHUE,
+        TRANGTHAI = p_TRANGTHAI
+    WHERE MANCC = p_MANCC;
+
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Cap nhat nha cung cap thanh cong');
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END UPDATE_NHACUNGCAP;
+/
+
+PROMPT === UPDATE_NHACUNGCAP: Created ===
+
+-- ==========================================
+-- 7. XÓA NHÀ CUNG CẤP
+-- ==========================================
+CREATE OR REPLACE PROCEDURE DELETE_NHACUNGCAP (
+    p_MANCC IN NUMBER
+)
+AS
+    v_count NUMBER;
+BEGIN
+    -- Kiểm tra nhà cung cấp tồn tại
+    SELECT COUNT(*) INTO v_count FROM NHACUNGCAP WHERE MANCC = p_MANCC;
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20030, 'Nha cung cap khong ton tai');
+    END IF;
+
+    -- Kiểm tra có đơn hàng từ nhà cung cấp không
+    SELECT COUNT(*) INTO v_count FROM DONHANG WHERE MANCC = p_MANCC;
+    IF v_count > 0 THEN
+        RAISE_APPLICATION_ERROR(-20036, 'Khong the xoa nha cung cap vi con don hang cua nha cung cap nay');
+    END IF;
+
+    -- Kiểm tra có hợp đồng từ nhà cung cấp không
+    SELECT COUNT(*) INTO v_count FROM HOPDONG WHERE MANCC = p_MANCC;
+    IF v_count > 0 THEN
+        RAISE_APPLICATION_ERROR(-20037, 'Khong the xoa nha cung cap vi con hop dong cua nha cung cap nay');
+    END IF;
+
+    -- Xóa nhà cung cấp
+    DELETE FROM NHACUNGCAP WHERE MANCC = p_MANCC;
+
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Xoa nha cung cap thanh cong');
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END DELETE_NHACUNGCAP;
+/
+
+PROMPT === DELETE_NHACUNGCAP: Created ===
+
+-- ==========================================
+-- 8. THAY ĐỔI TRẠNG THÁI NHÀ CUNG CẤP
+-- ==========================================
+CREATE OR REPLACE PROCEDURE CHANGE_STATUS_NHACUNGCAP (
+    p_MANCC     IN NUMBER,
+    p_TRANGTHAI IN VARCHAR2
+)
+AS
+    v_count NUMBER;
+BEGIN
+    -- Kiểm tra nhà cung cấp tồn tại
+    SELECT COUNT(*) INTO v_count FROM NHACUNGCAP WHERE MANCC = p_MANCC;
+    IF v_count = 0 THEN
+        RAISE_APPLICATION_ERROR(-20030, 'Nha cung cap khong ton tai');
+    END IF;
+
+    -- Kiểm tra trạng thái hợp lệ
+    IF p_TRANGTHAI NOT IN ('HoatDong', 'DungHopTac') THEN
+        RAISE_APPLICATION_ERROR(-20032, 'Trang thai khong hop le. Chi chap nhan: HoatDong, DungHopTac');
+    END IF;
+
+    -- Cập nhật trạng thái
+    UPDATE NHACUNGCAP
+    SET TRANGTHAI = p_TRANGTHAI
+    WHERE MANCC = p_MANCC;
+
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Thay doi trang thai nha cung cap thanh cong');
+
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END CHANGE_STATUS_NHACUNGCAP;
+/
+
+PROMPT === CHANGE_STATUS_NHACUNGCAP: Created ===
+
+-- ==========================================
+-- 9. THÊM NHÂN VIÊN (TẠO CẢ TÀI KHOẢN)
 -- ==========================================
 CREATE OR REPLACE PROCEDURE INSERT_NHANVIEN (
     p_MACH      IN NUMBER,
@@ -273,7 +494,7 @@ END INSERT_NHANVIEN;
 PROMPT === INSERT_NHANVIEN: Created ===
 
 -- ==========================================
--- 6. CẬP NHẬT NHÂN VIÊN
+-- 10. CẬP NHẬT NHÂN VIÊN
 -- ==========================================
 CREATE OR REPLACE PROCEDURE UPDATE_NHANVIEN (
     p_MANV      IN VARCHAR2,
@@ -332,7 +553,7 @@ END UPDATE_NHANVIEN;
 PROMPT === UPDATE_NHANVIEN: Created ===
 
 -- ==========================================
--- 7. VÔ HIỆU HÓA NHÂN VIÊN
+-- 11. VÔ HIỆU HÓA NHÂN VIÊN
 -- ==========================================
 CREATE OR REPLACE PROCEDURE DISABLE_NHANVIEN (
     p_MANV IN VARCHAR2
