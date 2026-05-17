@@ -37,12 +37,14 @@ public class NhanVienService {
      */
     public Page<NhanVienResponse> searchNhanVien(JwtUserPrincipal principal, Long machFilter, String chucvu, String trangthai, String search, Pageable pageable) {
         Long mach = null;
+        boolean excludeAdmin = false;
         
         // Phân quyền
         if ("Admin".equals(principal.getTennhom())) {
             mach = machFilter; // Admin có thể filter theo cửa hàng hoặc xem tất cả
         } else if ("QuanLyCuaHang".equals(principal.getTennhom())) {
             mach = principal.getMach(); // Quản lý cửa hàng chỉ xem được cửa hàng của mình
+            excludeAdmin = true; // Quản lý cửa hàng không được thấy Admin
             if (machFilter != null && !machFilter.equals(mach)) {
                 throw new AppException(ErrorCode.ACCESS_DENIED);
             }
@@ -51,6 +53,8 @@ public class NhanVienService {
         }
 
         final Long finalMach = mach;
+        final boolean finalExcludeAdmin = excludeAdmin;
+
         org.springframework.data.jpa.domain.Specification<TaiKhoan> spec = (root, query, cb) -> {
             // Eager fetch để tránh N+1 nếu không phải countQuery
             if (query.getResultType() != Long.class && query.getResultType() != long.class) {
@@ -61,10 +65,14 @@ public class NhanVienService {
 
             java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
             jakarta.persistence.criteria.Join<Object, Object> nv = root.join("nhanVien");
+            jakarta.persistence.criteria.Join<Object, Object> nhom = root.join("nhom");
 
             if (finalMach != null) {
                 jakarta.persistence.criteria.Join<Object, Object> ch = nv.join("cuaHang", jakarta.persistence.criteria.JoinType.LEFT);
                 predicates.add(cb.equal(ch.get("maCh"), finalMach));
+            }
+            if (finalExcludeAdmin) {
+                predicates.add(cb.notEqual(nhom.get("tenNhom"), "Admin"));
             }
             if (chucvu != null && !chucvu.isBlank()) {
                 predicates.add(cb.equal(nv.get("chucVu"), chucvu));
@@ -95,7 +103,8 @@ public class NhanVienService {
         Long maCh = tk.getNhanVien().getCuaHang() != null ? tk.getNhanVien().getCuaHang().getMaCh() : null;
 
         if ("QuanLyCuaHang".equals(principal.getTennhom())) {
-            if (maCh == null || !maCh.equals(principal.getMach())) {
+            // Không được xem Admin và phải cùng cửa hàng
+            if ("Admin".equals(tk.getNhom().getTenNhom()) || maCh == null || !maCh.equals(principal.getMach())) {
                 throw new AppException(ErrorCode.ACCESS_DENIED);
             }
         } else if (!"Admin".equals(principal.getTennhom())) {
@@ -132,6 +141,11 @@ public class NhanVienService {
         Long mach = request.getMaCh();
         if ("QuanLyCuaHang".equals(principal.getTennhom())) {
             mach = principal.getMach(); // Ép về cửa hàng của quản lý
+            
+            // Quản lý cửa hàng không được tạo tài khoản Admin (maNhom = 1)
+            if (request.getMaNhom() != null && request.getMaNhom().equals(1L)) {
+                throw new AppException(ErrorCode.ACCESS_DENIED);
+            }
         } else if (!"Admin".equals(principal.getTennhom())) {
             throw new AppException(ErrorCode.ACCESS_DENIED);
         }
@@ -228,7 +242,8 @@ public class NhanVienService {
 
         // Phân quyền
         if ("QuanLyCuaHang".equals(principal.getTennhom())) {
-            if (maCh == null || !maCh.equals(principal.getMach())) {
+            // Không được sửa Admin và phải cùng cửa hàng
+            if ("Admin".equals(tk.getNhom().getTenNhom()) || maCh == null || !maCh.equals(principal.getMach())) {
                 throw new AppException(ErrorCode.ACCESS_DENIED);
             }
         } else if (!"Admin".equals(principal.getTennhom())) {
